@@ -24,25 +24,28 @@ namespace FooRider.RuedaPracticeApp.ViewModels
     }
 
     private DelegateCommand newPracticeSubjectCmd;
-    public DelegateCommand NewPracticeSubjectCmd => newPracticeSubjectCmd ?? (newPracticeSubjectCmd = new DelegateCommand(NewPracticeSubject));
+    public DelegateCommand NewPracticeSubjectCmd => newPracticeSubjectCmd ?? (newPracticeSubjectCmd = new DelegateCommand(NewPracticeSubject, canExecuteMethod: () => true));
 
     private DelegateCommand savePracticeSubjectCmd;
-    public DelegateCommand SavePracticeSubjectCmd => savePracticeSubjectCmd ?? (savePracticeSubjectCmd = new DelegateCommand(SavePracticeSubject));
+    public DelegateCommand SavePracticeSubjectCmd => savePracticeSubjectCmd ?? (savePracticeSubjectCmd = new DelegateCommand(SavePracticeSubject, canExecuteMethod: () => CurrentPracticeSubject != null));
+
+    private DelegateCommand savePracticeSubjectAsCmd;
+    public DelegateCommand SavePracticeSubjectAsCmd => savePracticeSubjectAsCmd ?? (savePracticeSubjectAsCmd = new DelegateCommand(SavePracticeSubjectAs, canExecuteMethod: () => CurrentPracticeSubject != null));
 
     private DelegateCommand loadPracticeSubjectCmd;
-    public DelegateCommand LoadPracticeSubjectCmd => loadPracticeSubjectCmd ?? (loadPracticeSubjectCmd = new DelegateCommand(LoadPracticeSubject));
+    public DelegateCommand LoadPracticeSubjectCmd => loadPracticeSubjectCmd ?? (loadPracticeSubjectCmd = new DelegateCommand(LoadPracticeSubject, canExecuteMethod: () => true));
 
     public void Initialize()
     {
 
     }
 
-    public void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void CheckPendingChanges(object sender, System.ComponentModel.CancelEventArgs e)
     {
       if (CurrentPracticeSubject?.IsDirty ?? false)
       {
         var res = MessageBox.Show(
-          messageBoxText: "There are unsaved changes in current practice subject, do you want to save the changes?", 
+          messageBoxText: "There are unsaved changes in current practice subject, do you want to save the changes?",
           caption: "Unsaved changes are present",
           button: MessageBoxButton.YesNoCancel,
           icon: MessageBoxImage.Warning);
@@ -63,9 +66,19 @@ namespace FooRider.RuedaPracticeApp.ViewModels
       }
     }
 
+    public void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      CheckPendingChanges(sender, e);
+    }
+
     private void NewPracticeSubject()
     {
+      var e = new System.ComponentModel.CancelEventArgs();
+      CheckPendingChanges(this, e);
+      if (e.Cancel)
+        return;
 
+      
     }
 
     private void SavePracticeSubject()
@@ -73,8 +86,18 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 
     }
 
+    private void SavePracticeSubjectAs()
+    {
+
+    }
+
     private void LoadPracticeSubject()
     {
+      var e = new System.ComponentModel.CancelEventArgs();
+      CheckPendingChanges(this, e);
+      if (e.Cancel)
+        return;
+
 
     }
 
