@@ -1,9 +1,11 @@
 ﻿<Application x:Class="FooRider.RuedaPracticeApp.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:RuedaPracticeApp"
-             StartupUri="MainWindow.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
+             xmlns:local="clr-namespace:FooRider.RuedaPracticeApp"
+             xmlns:vm="clr-namespace:FooRider.RuedaPracticeApp.ViewModels"
+             StartupUri="MainWindow.xaml"
+             Activated="Application_Activated">
+  <Application.Resources>
+    <vm:MainVM x:Key="MainVM" />
+  </Application.Resources>
 </Application>

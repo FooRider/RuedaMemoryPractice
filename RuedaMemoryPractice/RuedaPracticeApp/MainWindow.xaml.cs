@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FooRider.RuedaPracticeApp.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,21 @@ namespace FooRider.RuedaPracticeApp
     public MainWindow()
     {
       InitializeComponent();
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+      ((MainVM)DataContext).Initialize();
+    }
+
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      ((MainVM)DataContext).OnClosing(sender, e);
+    }
+
+    private void Window_Closed(object sender, EventArgs e)
+    {
+      using ((MainVM)DataContext) { }
     }
   }
 }

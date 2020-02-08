@@ -2,6 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+/RuedaMemoryPractice/RuedaPracticeApp/bin
 /RuedaMemoryPractice/RuedaPracticeApp/obj
 /RuedaMemoryPractice/.vs
 /.vs
