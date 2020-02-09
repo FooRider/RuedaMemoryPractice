@@ -1,4 +1,5 @@
-﻿using FooRider.RuedaPracticeApp.Contracts.Persistency;
+﻿using FooRider.RuedaPracticeApp.Contracts.GlobalSettings;
+using FooRider.RuedaPracticeApp.Contracts.Persistency;
 using FooRider.RuedaPracticeApp.Helpers;
 using Microsoft.Win32;
 using Prism.Commands;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Windows;
 
 namespace FooRider.RuedaPracticeApp.ViewModels
@@ -37,6 +39,8 @@ namespace FooRider.RuedaPracticeApp.ViewModels
       UseDescriptionForTitle = true,
     };
 
+    private GlobalSettings globalSettings;
+
     private PracticeSubjectVM currentPracticeSubject;
     public PracticeSubjectVM CurrentPracticeSubject
     {
@@ -65,7 +69,45 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 
     public void Initialize()
     {
+      LoadGlobalSettings();
 
+      if (globalSettings == null)
+        globalSettings = new GlobalSettings();
+
+      if (!string.IsNullOrEmpty(globalSettings.LastPracticeSubjectPath)
+        && File.Exists(globalSettings.LastPracticeSubjectPath))
+        LoadPracticeSubject(globalSettings.LastPracticeSubjectPath);
+    }
+
+    private void LoadGlobalSettings()
+    {
+      try
+      {
+        var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var settingsFilePath = Path.Combine(appDataFolder, Constants.GlobalSettingsFilename);
+        if (File.Exists(settingsFilePath))
+        {
+          globalSettings = JsonSerializer.Deserialize<GlobalSettings>(File.ReadAllText(settingsFilePath));
+        }
+      }
+      catch (Exception ex)
+      {
+        // TODO log errors
+      }
+    }
+
+    private void SaveGlobalSettings()
+    {
+      try
+      {
+        var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var settingsFilePath = Path.Combine(appDataFolder, Constants.GlobalSettingsFilename);
+        File.WriteAllText(settingsFilePath, JsonSerializer.Serialize<GlobalSettings>(globalSettings, new JsonSerializerOptions() { WriteIndented = true, }));
+      }
+      catch (Exception ex)
+      {
+        // TODO log errors
+      }
     }
 
     private void CheckPendingChanges(object sender, System.ComponentModel.CancelEventArgs e)
@@ -97,6 +139,8 @@ namespace FooRider.RuedaPracticeApp.ViewModels
     public void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
     {
       CheckPendingChanges(sender, e);
+      if (!e.Cancel)
+        SaveGlobalSettings();
     }
 
     private void NewPracticeSubject()
@@ -133,6 +177,11 @@ namespace FooRider.RuedaPracticeApp.ViewModels
       CheckPendingChanges(this, e);
       if (e.Cancel)
         return;
+
+      if (!(openFileDialog.ShowDialog() ?? false))
+        return;
+
+      LoadPracticeSubject(openFileDialog.FileName);
     }
 
     private void CreateNewPracticeSubject(string practiceFilePath, string mediaFolder)
@@ -150,7 +199,36 @@ namespace FooRider.RuedaPracticeApp.ViewModels
             RelativeMediaPath = relPath,
           }));
 
-      Console.WriteLine(subj);
+      using (var fh = File.Open(practiceFilePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+      using (var writer = new Utf8JsonWriter(fh))
+        JsonSerializer.Serialize<PracticeSubject>(
+          writer,
+          subj, 
+          new JsonSerializerOptions() { WriteIndented = true, });
+
+      LoadPracticeSubject(practiceFilePath);
+    }
+
+    private void LoadPracticeSubject(string pathToSubject)
+    {
+      globalSettings.LastPracticeSubjectPath = pathToSubject;
+
+      var subj = JsonSerializer.Deserialize<PracticeSubject>(File.ReadAllText(pathToSubject)); // TODO deserialize using streams (or switch to Newtonsoft.Json?)
+
+      var subjVm = new PracticeSubjectVM()
+      {
+        IsDirty = false,
+        PathBase = subj.PathBase,
+      };
+
+      foreach (var i in subj.Items)
+        subjVm.Items.Add(new PracticeItemVM()
+        {
+          Name = i.Name,
+          RelativeMediaPath = i.RelativeMediaPath,
+        });
+
+      CurrentPracticeSubject = subjVm;
     }
 
 

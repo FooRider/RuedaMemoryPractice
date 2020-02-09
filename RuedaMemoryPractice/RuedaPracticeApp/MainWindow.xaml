@@ -11,14 +11,37 @@
         Closing="Window_Closing"
         Closed="Window_Closed">
   <Grid>
-    <Menu>
+    <Menu Grid.Row="0">
       <MenuItem Header="_File">
         <MenuItem Header="_New..." Command="{Binding NewPracticeSubjectCmd}" />
-        <MenuItem Header="_Load..." Command="{Binding LoadPracticeSubjectCmd}" />
+        <MenuItem Header="_Open..." Command="{Binding OpenPracticeSubjectCmd}" />
         <MenuItem Header="_Save" Command="{Binding SavePracticeSubjectCmd}" />
         <MenuItem Header="Save _as..." Command="{Binding SavePracticeSubjectAsCmd}" />
       </MenuItem>
     </Menu>
+
+    <Grid Grid.Row="1">
+
+      <ScrollViewer Grid.Row="1">
+        <ItemsControl ItemsSource="{Binding CurrentPracticeSubject.Items}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Content="{Binding Name}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+      
+      <Grid.RowDefinitions>
+        <RowDefinition Height="250" />
+        <RowDefinition />
+      </Grid.RowDefinitions>
+    </Grid>
 
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
