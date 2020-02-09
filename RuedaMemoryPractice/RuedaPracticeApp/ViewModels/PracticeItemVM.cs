@@ -34,6 +34,5 @@ namespace FooRider.RuedaPracticeApp.ViewModels
         }
       }
     }
-
   }
 }

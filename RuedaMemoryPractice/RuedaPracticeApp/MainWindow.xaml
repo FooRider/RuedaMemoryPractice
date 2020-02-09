@@ -13,10 +13,10 @@
   <Grid>
     <Menu>
       <MenuItem Header="_File">
-        <MenuItem Header="_New..." />
-        <MenuItem Header="_Load..." />
-        <MenuItem Header="_Save" />
-        <MenuItem Header="Save _as..." />
+        <MenuItem Header="_New..." Command="{Binding NewPracticeSubjectCmd}" />
+        <MenuItem Header="_Load..." Command="{Binding LoadPracticeSubjectCmd}" />
+        <MenuItem Header="_Save" Command="{Binding SavePracticeSubjectCmd}" />
+        <MenuItem Header="Save _as..." Command="{Binding SavePracticeSubjectAsCmd}" />
       </MenuItem>
     </Menu>
 
