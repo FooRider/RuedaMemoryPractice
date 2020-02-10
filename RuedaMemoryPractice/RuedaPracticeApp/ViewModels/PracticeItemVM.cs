@@ -34,5 +34,19 @@ namespace FooRider.RuedaPracticeApp.ViewModels
         }
       }
     }
+
+    private PracticeSubjectVM parentSubject;
+    public PracticeSubjectVM ParentSubject
+    {
+      get => parentSubject;
+      set
+      {
+        if (parentSubject != value)
+        {
+          parentSubject = value;
+          RaisePropertyChanged();
+        }
+      }
+    }
   }
 }

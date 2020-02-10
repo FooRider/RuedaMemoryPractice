@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FooRider.RuedaPracticeApp"
+        xmlns:converters="clr-namespace:FooRider.RuedaPracticeApp.Converters"
+        xmlns:vm="clr-namespace:FooRider.RuedaPracticeApp.ViewModels"
         mc:Ignorable="d"
         Title="Rueda Practice App" Height="450" Width="800"
         DataContext="{StaticResource MainVM}"
@@ -21,6 +23,37 @@
     </Menu>
 
     <Grid Grid.Row="1">
+      <Grid Grid.Row="0">
+        <Label Content="Video">
+          <Label.Visibility>
+            <Binding Path="CurrentItem.State" ConverterParameter="{x:Static vm:CurrentItemState.Playing}">
+              <Binding.Converter>
+                <converters:ConverterChain>
+                  <converters:EqualityConverter />
+                  <converters:TrueToVisibleConverter />
+                </converters:ConverterChain>
+              </Binding.Converter>
+            </Binding>
+          </Label.Visibility>
+        </Label>
+        
+        <MediaElement Grid.Column="0">
+          <!--<MediaElement.Visibility>
+            <Binding Path="CurrentItem">
+              
+            </Binding>
+          </MediaElement.Visibility>-->
+        </MediaElement>
+
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+          <Button Command="{Binding PlayRandomItemCmd}">Random</Button>
+        </StackPanel>
+
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition />
+          <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+      </Grid>
 
       <ScrollViewer Grid.Row="1">
         <ItemsControl ItemsSource="{Binding CurrentPracticeSubject.Items}">

@@ -16,6 +16,8 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 {
   public class MainVM : BindableBase, IDisposable
   {
+    private GlobalSettings globalSettings;
+
     private OpenFileDialog openFileDialog = new OpenFileDialog()
     {
       AddExtension = true,
@@ -38,8 +40,7 @@ namespace FooRider.RuedaPracticeApp.ViewModels
       Description = "Select folder containing practice media files",
       UseDescriptionForTitle = true,
     };
-
-    private GlobalSettings globalSettings;
+    private Random random = new Random();
 
     private PracticeSubjectVM currentPracticeSubject;
     public PracticeSubjectVM CurrentPracticeSubject
@@ -50,6 +51,20 @@ namespace FooRider.RuedaPracticeApp.ViewModels
         if (currentPracticeSubject != value)
         {
           currentPracticeSubject = value;
+          RaisePropertyChanged();
+        }
+      }
+    }
+
+    private CurrentItemVM currentItem = new CurrentItemVM();
+    public CurrentItemVM CurrentItem
+    {
+      get => currentItem;
+      set
+      {
+        if (currentItem != value)
+        {
+          currentItem = value;
           RaisePropertyChanged();
         }
       }
@@ -66,6 +81,12 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 
     private DelegateCommand openPracticeSubjectCmd;
     public DelegateCommand OpenPracticeSubjectCmd => openPracticeSubjectCmd ?? (openPracticeSubjectCmd = new DelegateCommand(OpenPracticeSubject, canExecuteMethod: () => true));
+
+    private DelegateCommand<PracticeItemVM> playItemCmd;
+    public DelegateCommand<PracticeItemVM> PlayItemCmd => playItemCmd ?? (playItemCmd = new DelegateCommand<PracticeItemVM>(PlayItem));
+
+    private DelegateCommand playRandomItemCmd;
+    public DelegateCommand PlayRandomItemCmd => playRandomItemCmd ?? (playRandomItemCmd = new DelegateCommand(PlayRandomItem));
 
     public void Initialize()
     {
@@ -226,11 +247,25 @@ namespace FooRider.RuedaPracticeApp.ViewModels
         {
           Name = i.Name,
           RelativeMediaPath = i.RelativeMediaPath,
+          ParentSubject = subjVm,
         });
 
       CurrentPracticeSubject = subjVm;
     }
 
+    private void PlayItem(PracticeItemVM practiceItem)
+    {
+      CurrentItem.Set(practiceItem);
+    }
+
+    private void PlayRandomItem()
+    {
+      if (CurrentPracticeSubject?.Items == null) return;
+
+      var itemCount = CurrentPracticeSubject.Items.Count;
+      var randomItem = CurrentPracticeSubject.Items[random.Next(0, itemCount)];
+      PlayItem(randomItem);
+    }
 
     public void Dispose()
     {

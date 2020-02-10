@@ -3,9 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FooRider.RuedaPracticeApp"
              xmlns:vm="clr-namespace:FooRider.RuedaPracticeApp.ViewModels"
+             xmlns:converters="clr-namespace:FooRider.RuedaPracticeApp.Converters"
              StartupUri="MainWindow.xaml"
              Activated="Application_Activated">
   <Application.Resources>
     <vm:MainVM x:Key="MainVM" />
+
+    <!--<converters:ConverterChain x:Key="CurrentItemStateToVideoVisibilityConverter">
+      
+    </converters:ConverterChain>-->
   </Application.Resources>
 </Application>
