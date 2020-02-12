@@ -8,5 +8,8 @@ namespace FooRider.RuedaPracticeApp.Contracts.Persistency
   {
     public string Name { get; set; }
     public string RelativeMediaPath { get; set; }
+
+    public int SuccessCount { get; set; } = 0;
+    public int FailureCount { get; set; } = 0;
   }
 }

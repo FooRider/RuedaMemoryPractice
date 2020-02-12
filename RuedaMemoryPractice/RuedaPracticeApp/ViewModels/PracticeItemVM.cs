@@ -48,5 +48,45 @@ namespace FooRider.RuedaPracticeApp.ViewModels
         }
       }
     }
+
+    private int successCount = 0;
+    public int SuccessCount
+    {
+      get => successCount;
+      set
+      {
+        if (successCount != value)
+        {
+          successCount = value;
+          RaisePropertyChanged();
+          RaisePropertyChanged(nameof(SuccessPercentage));
+        }
+      }
+    }
+
+    private int failureCount = 0;
+    public int FailureCount
+    {
+      get => failureCount;
+      set
+      {
+        if (failureCount != value)
+        {
+          failureCount = value;
+          RaisePropertyChanged();
+          RaisePropertyChanged(nameof(SuccessPercentage));
+        }
+      }
+    }
+
+    public float SuccessPercentage
+    {
+      get
+      {
+        var total = SuccessCount + FailureCount;
+        if (total == 0) return 0;
+        return 100 * ((float)SuccessCount / (float)total);
+      }
+    }
   }
 }

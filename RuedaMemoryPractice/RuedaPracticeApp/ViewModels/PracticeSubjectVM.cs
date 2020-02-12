@@ -61,6 +61,8 @@ namespace FooRider.RuedaPracticeApp.ViewModels
         {
           Name = pivm.Name,
           RelativeMediaPath = pivm.RelativeMediaPath,
+          SuccessCount = pivm.SuccessCount,
+          FailureCount = pivm.FailureCount,
         }).ToList(),
       };
 

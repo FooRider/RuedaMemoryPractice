@@ -78,12 +78,18 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 
     private void RecallSuccess()
     {
+      if (CurrentItem == null) return;
 
+      CurrentItem.SuccessCount++;
+      CurrentItem.ParentSubject.IsDirty = true;
     }
 
     private void RecallFailure()
     {
+      if (CurrentItem == null) return;
 
+      CurrentItem.FailureCount++;
+      CurrentItem.ParentSubject.IsDirty = true;
     }
 
 

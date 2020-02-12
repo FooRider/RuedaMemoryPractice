@@ -88,8 +88,8 @@ namespace FooRider.RuedaPracticeApp.ViewModels
     private DelegateCommand reScanItemsCmd;
     public DelegateCommand ReScanItemsCmd => reScanItemsCmd ?? (reScanItemsCmd = new DelegateCommand(ReScanItems));
 
-    private DelegateCommand<PracticeItemVM> playItemCmd;
-    public DelegateCommand<PracticeItemVM> PlayItemCmd => playItemCmd ?? (playItemCmd = new DelegateCommand<PracticeItemVM>(SetItem));
+    private DelegateCommand<PracticeItemVM> setItemCmd;
+    public DelegateCommand<PracticeItemVM> SetItemCmd => setItemCmd ?? (setItemCmd = new DelegateCommand<PracticeItemVM>(SetItem));
 
     private DelegateCommand playRandomItemCmd;
     public DelegateCommand PlayRandomItemCmd => playRandomItemCmd ?? (playRandomItemCmd = new DelegateCommand(PlayRandomItem));
@@ -322,6 +322,8 @@ namespace FooRider.RuedaPracticeApp.ViewModels
           Name = i.Name,
           RelativeMediaPath = i.RelativeMediaPath,
           ParentSubject = subjVm,
+          SuccessCount = i.SuccessCount,
+          FailureCount = i.FailureCount,
         });
 
       CurrentPracticeSubject = subjVm;

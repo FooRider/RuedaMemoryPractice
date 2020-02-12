@@ -39,8 +39,13 @@
         </Label>-->
 
         <DockPanel Grid.Column="0">
-          <Label DockPanel.Dock="Top" Content="{Binding CurrentItem.CurrentItem.Name}"
-                 FontSize="25" HorizontalAlignment="Center"/>
+          <Label DockPanel.Dock="Top"
+                 FontSize="25" HorizontalAlignment="Center">
+            <TextBlock>
+              <Run Text="{Binding CurrentItem.CurrentItem.Name}" />
+              <Run Text="(" /><Run Text="{Binding CurrentItem.CurrentItem.SuccessPercentage, Mode=OneWay, StringFormat=0}"/><Run Text="%)" />
+            </TextBlock>
+          </Label>
 
           <MediaElement Name="MediaPlayer" LoadedBehavior="Manual">
             <MediaElement.Visibility>
@@ -78,7 +83,13 @@
           </ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Button Content="{Binding Name}" />
+              <Button Command="{Binding Path=DataContext.SetItemCmd, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                      CommandParameter="{Binding}">
+                <TextBlock>
+                  <Run Text="{Binding Name}"/>
+                  <Run Text="(" /><Run Text="{Binding SuccessPercentage, Mode=OneWay, StringFormat=0}"/><Run Text="%)" />
+                </TextBlock>
+              </Button>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
