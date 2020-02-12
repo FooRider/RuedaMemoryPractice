@@ -1,4 +1,5 @@
-﻿using FooRider.RuedaPracticeApp.ViewModels;
+﻿using FooRider.RuedaPracticeApp.Contracts.Internal;
+using FooRider.RuedaPracticeApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace FooRider.RuedaPracticeApp
   /// <summary>
   /// Interaction logic for MainWindow.xaml
   /// </summary>
-  public partial class MainWindow : Window
+  public partial class MainWindow : Window, IPlayerControls
   {
     public MainWindow()
     {
@@ -28,7 +29,7 @@ namespace FooRider.RuedaPracticeApp
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-      ((MainVM)DataContext).Initialize();
+      ((MainVM)DataContext).Initialize(this);
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -39,6 +40,18 @@ namespace FooRider.RuedaPracticeApp
     private void Window_Closed(object sender, EventArgs e)
     {
       using ((MainVM)DataContext) { }
+    }
+
+    public void PlayMediaFile(string path)
+    {
+      MediaPlayer.Stop();
+      MediaPlayer.Source = new Uri(path);
+      MediaPlayer.Play();
+    }
+
+    public void Stop()
+    {
+      MediaPlayer.Stop();
     }
   }
 }

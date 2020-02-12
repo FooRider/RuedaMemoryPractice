@@ -1,7 +1,9 @@
-﻿using Prism.Mvvm;
+﻿using FooRider.RuedaPracticeApp.Contracts.Persistency;
+using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 
 namespace FooRider.RuedaPracticeApp.ViewModels
@@ -48,6 +50,22 @@ namespace FooRider.RuedaPracticeApp.ViewModels
           RaisePropertyChanged();
         }
       }
+    }
+
+    public PracticeSubject ToPracticeSubject()
+    {
+      var res = new PracticeSubject()
+      {
+        PathBase = PathBase,
+        Items = Items.Select(pivm => new PracticeItem()
+        {
+          Name = pivm.Name,
+          RelativeMediaPath = pivm.RelativeMediaPath,
+        }).ToList(),
+      };
+
+
+      return res;
     }
   }
 }

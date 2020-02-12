@@ -19,12 +19,13 @@
         <MenuItem Header="_Open..." Command="{Binding OpenPracticeSubjectCmd}" />
         <MenuItem Header="_Save" Command="{Binding SavePracticeSubjectCmd}" />
         <MenuItem Header="Save _as..." Command="{Binding SavePracticeSubjectAsCmd}" />
+        <MenuItem Header="_Re-scan media" Command="{Binding ReScanItemsCmd}" />
       </MenuItem>
     </Menu>
 
     <Grid Grid.Row="1">
       <Grid Grid.Row="0">
-        <Label Content="Video">
+        <!--<Label Content="Video">
           <Label.Visibility>
             <Binding Path="CurrentItem.State" ConverterParameter="{x:Static vm:CurrentItemState.Playing}">
               <Binding.Converter>
@@ -35,18 +36,31 @@
               </Binding.Converter>
             </Binding>
           </Label.Visibility>
-        </Label>
-        
-        <MediaElement Grid.Column="0">
-          <!--<MediaElement.Visibility>
-            <Binding Path="CurrentItem">
-              
-            </Binding>
-          </MediaElement.Visibility>-->
-        </MediaElement>
+        </Label>-->
+
+        <DockPanel Grid.Column="0">
+          <Label DockPanel.Dock="Top" Content="{Binding CurrentItem.CurrentItem.Name}"
+                 FontSize="25" HorizontalAlignment="Center"/>
+
+          <MediaElement Name="MediaPlayer" LoadedBehavior="Manual">
+            <MediaElement.Visibility>
+              <Binding Path="CurrentItem.State" ConverterParameter="{x:Static vm:CurrentItemState.Playing}">
+                <Binding.Converter>
+                  <converters:ConverterChain>
+                    <converters:EqualityConverter />
+                    <converters:TrueToVisibleConverter />
+                  </converters:ConverterChain>
+                </Binding.Converter>
+              </Binding>
+            </MediaElement.Visibility>
+          </MediaElement>
+        </DockPanel>
 
         <StackPanel Grid.Column="1" Orientation="Vertical">
           <Button Command="{Binding PlayRandomItemCmd}">Random</Button>
+          <Button Command="{Binding CurrentItem.CheckCmd}">Check</Button>
+          <Button Command="{Binding CurrentItem.RecallSuccessCmd}">Success</Button>
+          <Button Command="{Binding CurrentItem.RecallFailureCmd}">Failure</Button>
         </StackPanel>
 
         <Grid.ColumnDefinitions>

@@ -1,4 +1,5 @@
 ﻿using FooRider.RuedaPracticeApp.Contracts.GlobalSettings;
+using FooRider.RuedaPracticeApp.Contracts.Internal;
 using FooRider.RuedaPracticeApp.Contracts.Persistency;
 using FooRider.RuedaPracticeApp.Helpers;
 using Microsoft.Win32;
@@ -16,6 +17,8 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 {
   public class MainVM : BindableBase, IDisposable
   {
+    private IPlayerControls playerControls;
+
     private GlobalSettings globalSettings;
 
     private OpenFileDialog openFileDialog = new OpenFileDialog()
@@ -82,14 +85,20 @@ namespace FooRider.RuedaPracticeApp.ViewModels
     private DelegateCommand openPracticeSubjectCmd;
     public DelegateCommand OpenPracticeSubjectCmd => openPracticeSubjectCmd ?? (openPracticeSubjectCmd = new DelegateCommand(OpenPracticeSubject, canExecuteMethod: () => true));
 
+    private DelegateCommand reScanItemsCmd;
+    public DelegateCommand ReScanItemsCmd => reScanItemsCmd ?? (reScanItemsCmd = new DelegateCommand(ReScanItems));
+
     private DelegateCommand<PracticeItemVM> playItemCmd;
-    public DelegateCommand<PracticeItemVM> PlayItemCmd => playItemCmd ?? (playItemCmd = new DelegateCommand<PracticeItemVM>(PlayItem));
+    public DelegateCommand<PracticeItemVM> PlayItemCmd => playItemCmd ?? (playItemCmd = new DelegateCommand<PracticeItemVM>(SetItem));
 
     private DelegateCommand playRandomItemCmd;
     public DelegateCommand PlayRandomItemCmd => playRandomItemCmd ?? (playRandomItemCmd = new DelegateCommand(PlayRandomItem));
 
-    public void Initialize()
+    public void Initialize(MainWindow mainWindow)
     {
+      playerControls = (IPlayerControls)mainWindow;
+      CurrentItem.Player = playerControls;
+
       LoadGlobalSettings();
 
       if (globalSettings == null)
@@ -184,11 +193,24 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 
     private void SavePracticeSubject()
     {
+      if (CurrentPracticeSubject == null) return;
 
+      var x = CurrentPracticeSubject.ToPracticeSubject();
+
+      using (var fh = File.Open(globalSettings.LastPracticeSubjectPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+      using (var writer = new Utf8JsonWriter(fh))
+        JsonSerializer.Serialize<PracticeSubject>(
+          writer,
+          x,
+          new JsonSerializerOptions() { WriteIndented = true, });
+
+      CurrentPracticeSubject.IsDirty = false;
     }
 
     private void SavePracticeSubjectAs()
     {
+      if (CurrentPracticeSubject == null) return;
+
 
     }
 
@@ -230,6 +252,58 @@ namespace FooRider.RuedaPracticeApp.ViewModels
       LoadPracticeSubject(practiceFilePath);
     }
 
+    private void ReScanItems()
+    {
+      if (CurrentPracticeSubject == null) return;
+
+      var items = MediaFinder.FindMediaFiles(CurrentPracticeSubject.PathBase)
+        .Select(relPath => new PracticeItem()
+        {
+          Name = Path.GetFileNameWithoutExtension(relPath),
+          RelativeMediaPath = relPath,
+        })
+        .ToArray();
+
+      var newItems = new List<PracticeItem>();
+      var removedItems = new List<PracticeItemVM>();
+
+      foreach (var cpi in items)
+      {
+        var itemVm = CurrentPracticeSubject.Items.FirstOrDefault(pivm => pivm.RelativeMediaPath.ToLowerInvariant() == cpi.RelativeMediaPath.ToLowerInvariant());
+        if (itemVm == null)
+          newItems.Add(cpi);
+      }
+
+      foreach (var cpivm in CurrentPracticeSubject.Items)
+      {
+        var cpi = items.FirstOrDefault(cpi1 => cpi1.RelativeMediaPath.ToLowerInvariant() == cpivm.RelativeMediaPath.ToLowerInvariant());
+        if (cpi == null)
+          removedItems.Add(cpivm);
+      }
+
+      bool changed = false;
+
+      foreach (var rivm in removedItems)
+      {
+        CurrentPracticeSubject.Items.Remove(rivm);
+        changed = true;
+      }
+
+      foreach (var ncpi in newItems)
+      {
+        CurrentPracticeSubject.Items.Add(new PracticeItemVM()
+        {
+          Name = ncpi.Name,
+          RelativeMediaPath = ncpi.RelativeMediaPath,
+          ParentSubject = CurrentPracticeSubject,
+        });
+        changed = true;
+      }
+
+      if (changed)
+        CurrentPracticeSubject.IsDirty = true;
+    }
+
     private void LoadPracticeSubject(string pathToSubject)
     {
       globalSettings.LastPracticeSubjectPath = pathToSubject;
@@ -253,7 +327,7 @@ namespace FooRider.RuedaPracticeApp.ViewModels
       CurrentPracticeSubject = subjVm;
     }
 
-    private void PlayItem(PracticeItemVM practiceItem)
+    private void SetItem(PracticeItemVM practiceItem)
     {
       CurrentItem.Set(practiceItem);
     }
@@ -264,7 +338,7 @@ namespace FooRider.RuedaPracticeApp.ViewModels
 
       var itemCount = CurrentPracticeSubject.Items.Count;
       var randomItem = CurrentPracticeSubject.Items[random.Next(0, itemCount)];
-      PlayItem(randomItem);
+      SetItem(randomItem);
     }
 
     public void Dispose()
