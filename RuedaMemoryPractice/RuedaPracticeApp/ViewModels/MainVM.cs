@@ -86,7 +86,7 @@ namespace FooRider.RuedaPracticeApp.ViewModels
     public DelegateCommand OpenPracticeSubjectCmd => openPracticeSubjectCmd ?? (openPracticeSubjectCmd = new DelegateCommand(OpenPracticeSubject, canExecuteMethod: () => true));
 
     private DelegateCommand reScanItemsCmd;
-    public DelegateCommand ReScanItemsCmd => reScanItemsCmd ?? (reScanItemsCmd = new DelegateCommand(ReScanItems));
+    public DelegateCommand ReScanItemsCmd => reScanItemsCmd ?? (reScanItemsCmd = new DelegateCommand(ReScanItems, canExecuteMethod: () => CurrentPracticeSubject != null));
 
     private DelegateCommand<PracticeItemVM> setItemCmd;
     public DelegateCommand<PracticeItemVM> SetItemCmd => setItemCmd ?? (setItemCmd = new DelegateCommand<PracticeItemVM>(SetItem));
@@ -211,7 +211,10 @@ namespace FooRider.RuedaPracticeApp.ViewModels
     {
       if (CurrentPracticeSubject == null) return;
 
+      if (!(saveFileDialog.ShowDialog() ?? false)) return;
 
+      globalSettings.LastPracticeSubjectPath = saveFileDialog.FileName;
+      SavePracticeSubject();
     }
 
     private void OpenPracticeSubject()

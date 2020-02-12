@@ -48,6 +48,18 @@
               <Run Text="Unsuccessfully recalled: " /><Run Text="{Binding CurrentItem.CurrentItem.FailureCount, Mode=OneWay, StringFormat=0}"/>
             </TextBlock>
           </Label>
+
+          <Button Command="{Binding PlayRandomItemCmd}" Margin="5" Padding="4">Random</Button>
+          <Button Command="{Binding CurrentItem.CheckCmd}" Margin="5" Padding="4">Check</Button>
+          <Grid>
+            <Button Command="{Binding CurrentItem.RecallSuccessCmd}" Margin="5" Padding="4" Grid.Column="0">Success</Button>
+            <Button Command="{Binding CurrentItem.RecallFailureCmd}" Margin="5" Padding="4" Grid.Column="1">Failure</Button>
+
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition/>
+              <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+          </Grid>
         </StackPanel>
 
         <MediaElement Name="MediaPlayer" LoadedBehavior="Manual"
@@ -64,17 +76,9 @@
           </MediaElement.Visibility>
         </MediaElement>
 
-        <StackPanel Grid.Column="2" Orientation="Vertical">
-          <Button Command="{Binding PlayRandomItemCmd}">Random</Button>
-          <Button Command="{Binding CurrentItem.CheckCmd}">Check</Button>
-          <Button Command="{Binding CurrentItem.RecallSuccessCmd}">Success</Button>
-          <Button Command="{Binding CurrentItem.RecallFailureCmd}">Failure</Button>
-        </StackPanel>
-
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="300" />
+          <ColumnDefinition Width="350" />
           <ColumnDefinition />
-          <ColumnDefinition Width="100" />
         </Grid.ColumnDefinitions>
       </Grid>
 
@@ -89,6 +93,8 @@
             <DataTemplate>
               <Button Command="{Binding Path=DataContext.SetItemCmd, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
                       CommandParameter="{Binding}"
+                      Padding="3"
+                      Margin="3"
                       HorizontalContentAlignment="Left">
                 <TextBlock>
                   <Run Text="(" /><Run Text="{Binding SuccessPercentage, Mode=OneWay, StringFormat=0}"/><Run Text="%)" />
